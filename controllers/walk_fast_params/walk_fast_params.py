@@ -37,6 +37,7 @@ class Sprinter(Robot):
         # # Get pointers to the onboard cameras (not used).
         # self.CameraTop = self.getDevice('CameraTop')
         # self.CameraBottom = self.getDevice('CameraBottom')
+        
         # # Enable the cameras.
         # self.CameraTop.enable(self.timeStep)
         # self.CameraBottom.enable(self.timeStep)
@@ -96,26 +97,26 @@ class Sprinter(Robot):
             self.move_joints_smooth(
             joints=[self.RAnkleRoll, self.LAnkleRoll, self.LKneePitch, self.RKneePitch, self.LHipPitch, self.RHipPitch, self.LAnklePitch, self.RAnklePitch],
             target_positions=[0.1, 0.1, 0.6, 0.6, -0.6, -0.6, -0.3, -0.3 ],
-            durations=0.3
+            durations=0.2
             )
             #first step
             self.move_joints_smooth(
                 joints=[self.RAnklePitch, self.RKneePitch, self.RHipPitch, self.LAnklePitch],
                 target_positions=[0.1, 0.4, -0.9, -0.4],
-                durations=0.3
+                durations=0.2
             )
             self.move_joints_smooth(
                 joints=[self.RAnkleRoll, self.LAnkleRoll],
-                target_positions=[-0.15, -0.15],
-                durations=0.3
+                target_positions=[-0.13, -0.13],
+                durations=0.2
             )
             #second step
             self.move_joints_smooth(
                 joints=[self.RAnklePitch, self.RKneePitch, self.RHipPitch, self.LAnklePitch, self.LKneePitch, self.LHipPitch, self.RAnkleRoll, self.LAnkleRoll],
-                target_positions=[-0.2, 0.4, -0.6, -0.28, 0.6, -0.75 , 0, 0],
-                durations=0.5
+                target_positions=[-0.2, 0.4, -0.6, -0.31, 0.6, -0.7 , 0.05, 0.05],
+                durations=[0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.4, 0.4]
             )
-            self.pause(0.1)
+            self.pause(0.06)
 
             if self.step(self.timeStep) == -1:
                 break
@@ -124,22 +125,6 @@ class Sprinter(Robot):
 controller = Sprinter()
 controller.initialize()
 controller.run()
-
-# self.move_joint_smooth(self.RAnkleRoll, -0.1, 0.2) # joint, target_position, duration
-#         self.move_joint_smooth(self.RHipRoll, -0.1, 0.2) # joint, target_position, duration
-#         self.move_joint_smooth(self.LShoulderRoll, 0.5, 0.2) # joint, target_position, duration
-#         # self.move_joint_smooth(self.LHipRoll, 0.2, 0.2) # joint, target_position, duration
-#         self.pause(0.1)
-#         self.move_joint_smooth(self.RAnkleRoll, 0.1, 0.1) # joint, target_position, duration
-#         self.move_joint_smooth(self.RAnklePitch, -0.2, 0.1) # joint, target_position, duration
-
-#         # self.move_joint_smooth(self.LHipRoll, 0.3, 0.1) # joint, target_position, duration
-#         self.pause(0.1)
-#         self.move_joint_smooth(self.RKneePitch, 0.6, 0.3) # joint, target_position, duration
-#         self.move_joint_smooth(self.RHipPitch, -0.6, 0.3) # joint, target_position, duration
-#         self.pause(0.3)
-#         self.move_joint_smooth(self.LHipPitch, -0.6, 0.1) # joint, target_position, duration
-#         self.move_joint_smooth(self.LAnklePitch, -0.2, 0.1) # joint, target_position, duration
 
 # walk = Motion('forward.motion') 
 #         walk.setLoop(True)
