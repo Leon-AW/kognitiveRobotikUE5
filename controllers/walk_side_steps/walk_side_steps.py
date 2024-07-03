@@ -88,24 +88,48 @@ class Sprinter(Robot):
                 return
 
     def run(self):
-        """Play the forward motion and loop on the walking cycle."""   
-
-        self.move_joints_smooth(                                                        
-            joints=[self.RHipPitch, self.LHipPitch, self.LAnklePitch, self.RAnklePitch],
-            target_positions=[-0.2, -0.2, -0.1, -0.1],
-            durations=0.5
-            )
-        self.pause(0.5)
-        self.move_joints_smooth(                                                        
-            joints=[self.RAnkleRoll, self.LAnkleRoll, self.RKneePitch, self.RHipPitch, self.RAnklePitch, self.RHipRoll, self.RKneePitch, self.LKneePitch, self.RHipPitch, self.LAnkleRoll, self.RAnkleRoll, self.LHipRoll, self.RAnklePitch ],
-            target_positions=[0.1, 0.2, 0.6, -0.8, -0.2, -0.3, 0.3, 0.3, -0.2, -0.2, 0.2, 0.1, -0.1],
-            durations=[0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3],
-            start_times=[0, 0, 0, 0, 0, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15]
-            )
+        """Play the forward motion and loop on the walking cycle."""         
 
         
         
         while True:
+
+            self.move_joints_smooth(                                                        
+            joints=[self.RHipPitch, self.LHipPitch, self.LAnklePitch, self.RAnklePitch, self.LShoulderRoll],
+            target_positions=[-0.2, -0.2, -0.1, -0.1, 1.5],
+            durations=0.5
+            )
+            self.pause(0.5)
+            self.move_joints_smooth(                                                        
+                joints=[self.RAnkleRoll, self.LAnkleRoll, self.RKneePitch, self.RHipPitch, self.RAnklePitch, self.RHipRoll, self.RKneePitch, self.LKneePitch, self.RHipPitch, self.LAnkleRoll, self.RAnkleRoll, self.LHipRoll, self.RAnklePitch, self.LShoulderRoll ],
+                target_positions=[0.1, 0.2, 0.6, -0.8, -0.2, -0.3, 0.3, 0.3, -0.2, -0.2, 0.2, 0.1, -0.1, 0],
+                durations=0.3,
+                start_times=[0, 0, 0, 0, 0, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15]
+                )
+            self.pause(0.5)
+
+            self.move_joints_smooth(                                                        
+                joints=[self.RHipRoll, self.LHipRoll, self.RAnkleRoll, self.RShoulderRoll, self.LKneePitch],
+                target_positions=[0, 0.6, -0.12, -1.5, 0],
+                durations=[0.5, 0.7, 0.7, 0.5, 0.5],
+                start_times=[0, 0, 0, 0, 0]
+                )
+            self.move_joints_smooth(                                                        
+                joints=[self.RShoulderRoll, self.LKneePitch, self.LHipRoll,self.LHipPitch, self.LAnklePitch, self.LAnklePitch, self.LKneePitch, self.LHipPitch, self.LAnkleRoll],
+                target_positions=[0, 0.8, 0, -0.7, -0.8, -0.1, 0.3, -0.2, 0],
+                durations=[0.5, 0.2, 0.2, 0.2, 0.5, 0.2, 0.25, 0.25, 0.1],
+                start_times=[0.1, 0, 0, 0, 0, 0, 0, 0, 0]
+                )
+            self.pause(0.3)
+            # New movement to bring the robot back to original position
+            self.LAnklePitch.setPosition(-0.1)
+            self.RAnklePitch.setPosition(-0.1)
+            self.LKneePitch.setPosition(0.3)
+            self.RKneePitch.setPosition(0.3)
+            self.RAnkleRoll.setPosition(0.1)
+            self.LAnkleRoll.setPosition(0.1)
+
+            self.pause(0.5)
 
             if self.step(self.timeStep) == -1:
                 break
