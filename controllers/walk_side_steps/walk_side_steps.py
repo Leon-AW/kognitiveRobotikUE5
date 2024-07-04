@@ -88,9 +88,7 @@ class Sprinter(Robot):
                 return
 
     def run(self):
-        """Play the forward motion and loop on the walking cycle."""         
-
-        
+        """Play the forward motion and loop on the walking cycle."""
         
         while True:
 
