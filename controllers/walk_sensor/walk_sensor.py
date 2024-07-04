@@ -19,8 +19,8 @@ class Sprinter(Robot):
         self.LShoulderPitch.setPosition(1.1)
 
         # # Get pointers to the 12 motors of the legs (not used).
-        # self.RHipYawPitch = self.getDevice('RHipYawPitch')
-        # self.LHipYawPitch = self.getDevice('LHipYawPitch')
+        self.RHipYawPitch = self.getDevice('RHipYawPitch')
+        self.LHipYawPitch = self.getDevice('LHipYawPitch')
         self.RHipRoll = self.getDevice('RHipRoll')
         self.LHipRoll = self.getDevice('LHipRoll')
         self.RHipPitch = self.getDevice('RHipPitch')
@@ -117,15 +117,14 @@ class Sprinter(Robot):
         """Play the forward motion and loop on the walking cycle."""
         self.move_joints_smooth(
             joints=[self.RAnkleRoll, self.LAnkleRoll],
-            target_positions=[-0.1, -0.1],
+            target_positions=[0.1, 0.1],
             durations=0.4
         ) # joints, target_positions, durations, start_times
 
         
         while True:
-            self.oscillate_joint(self.RHipRoll, -0.7, 1, 0, 1.2, use_sin=True) # joint, amplitude, frequency, phase, duration, use_sin=True
-            # self.oscillate_joint_full(self.RAnkleRoll, -0.2, 1, 0, 1.2, use_sin=True) # joint, amplitude, frequency, phase, duration, use_sin=True
-            self.oscillate_joint_full(self.LAnkleRoll, 0.2, 1, 0, 1.2, use_sin=True) # joint, amplitude, frequency, phase, duration, use_sin=True
+            self.oscillate_joint(self.LHipYawPitch, -0.7, 1, 0, 1.2, use_sin=True) # joint, amplitude, frequency, phase, duration, use_sin=True
+            # self.oscillate_joint(self.RHipYawPitch, 0.7, 1, 0, 1.2, use_sin=True) # joint, amplitude, frequency, phase, duration, use_sin=True
             self.pause(0.2)
 
             if self.step(self.timeStep) == -1:
