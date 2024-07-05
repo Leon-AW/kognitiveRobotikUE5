@@ -1,7 +1,6 @@
 """Sample Webots controller for the humanoid sprint benchmark."""
 
 from controller import Robot, Motion
-import math
 
 
 class Sprinter(Robot):
@@ -19,8 +18,8 @@ class Sprinter(Robot):
         self.LShoulderPitch.setPosition(1.1)
 
         # # Get pointers to the 12 motors of the legs (not used).
-        self.RHipYawPitch = self.getDevice('RHipYawPitch')
-        self.LHipYawPitch = self.getDevice('LHipYawPitch')
+        # self.RHipYawPitch = self.getDevice('RHipYawPitch')
+        # self.LHipYawPitch = self.getDevice('LHipYawPitch')
         self.RHipRoll = self.getDevice('RHipRoll')
         self.LHipRoll = self.getDevice('LHipRoll')
         self.RHipPitch = self.getDevice('RHipPitch')
@@ -35,6 +34,10 @@ class Sprinter(Robot):
         self.RShoulderRoll = self.getDevice('RShoulderRoll')
         # getting pointer to the 2 shoulder motors
 
+        # Get pointer to the gyroscope and enable it
+        self.gyro = self.getDevice('gyro')
+        self.gyro.enable(self.timeStep)
+
         # # Get pointers to the onboard cameras (not used).
         # self.CameraTop = self.getDevice('CameraTop')
         # self.CameraBottom = self.getDevice('CameraBottom')
@@ -43,6 +46,24 @@ class Sprinter(Robot):
         # self.CameraTop.enable(self.timeStep)
         # self.CameraBottom.enable(self.timeStep)
 
+    def stabilize(self):
+        """Use gyroscope data to stabilize the robot."""
+        gyro_data = self.gyro.getValues()
+        roll = gyro_data[0]
+        pitch = gyro_data[1]
+        
+        # Apply corrections based on gyroscope data to ankle and hip joints
+        correction_factor = 0.001
+        self.RAnkleRoll.setPosition(self.RAnkleRoll.getTargetPosition() - correction_factor * roll)
+        self.LAnkleRoll.setPosition(self.LAnkleRoll.getTargetPosition() - correction_factor * roll)
+        self.RHipRoll.setPosition(self.RHipRoll.getTargetPosition() - correction_factor * roll)
+        self.LHipRoll.setPosition(self.LHipRoll.getTargetPosition() - correction_factor * roll)
+        
+        self.RAnklePitch.setPosition(self.RAnklePitch.getTargetPosition() - correction_factor * pitch)
+        self.LAnklePitch.setPosition(self.LAnklePitch.getTargetPosition() - correction_factor * pitch)
+        self.RHipPitch.setPosition(self.RHipPitch.getTargetPosition() - correction_factor * pitch)
+        self.LHipPitch.setPosition(self.LHipPitch.getTargetPosition() - correction_factor * pitch)
+        
     def move_joints_smooth(self, joints, target_positions, durations, start_times=None):
         """Move specified joints smoothly to their target positions."""
         if len(joints) != len(target_positions):
@@ -79,31 +100,6 @@ class Sprinter(Robot):
         for joint, target_position in zip(joints, target_positions):
             joint.setPosition(target_position)
         self.step(self.timeStep)
-
-
-    def oscillate_joint_full(self, joint, amplitude, frequency, phase, duration, use_sin=True):
-        """Oscillate a given joint using sinusoidal or cosinusoidal function."""
-        start_time = self.getTime()
-        while self.getTime() - start_time < duration:
-            time = self.getTime() - start_time
-            position = amplitude * (math.sin(2 * math.pi * frequency * time + phase) if use_sin else math.cos(2 * math.pi * frequency * time + phase))
-            joint.setPosition(position)
-            if self.step(self.timeStep) == -1:
-                break
-
-        
-    def oscillate_joint(self, joint, amplitude, frequency, phase, duration, use_sin=True):
-        """Oscillate a given joint using sinusoidal or cosinusoidal function within a specified range."""
-        start_time = self.getTime()
-        while self.getTime() - start_time < duration:
-            time = self.getTime() - start_time
-            if amplitude > 0:
-                position = amplitude * (0.5 * (1 + (math.sin(2 * math.pi * frequency * time + phase) if use_sin else math.cos(2 * math.pi * frequency * time + phase))))
-            else:
-                position = amplitude * (0.5 * (1 - (math.sin(2 * math.pi * frequency * time + phase) if use_sin else math.cos(2 * math.pi * frequency * time + phase))))
-            joint.setPosition(position)
-            if self.step(self.timeStep) == -1:
-                break
         
 
     def pause(self, duration):
@@ -114,18 +110,36 @@ class Sprinter(Robot):
                 return
 
     def run(self):
-        """Play the forward motion and loop on the walking cycle."""
-        self.move_joints_smooth(
-            joints=[self.RAnkleRoll, self.LAnkleRoll],
-            target_positions=[0.1, 0.1],
-            durations=0.4
-        ) # joints, target_positions, durations, start_times
+        """Play the forward motion and loop on the walking cycle."""   
+
 
         
+        
         while True:
-            self.oscillate_joint(self.LHipYawPitch, -0.7, 1, 0, 1.2, use_sin=True) # joint, amplitude, frequency, phase, duration, use_sin=True
-            # self.oscillate_joint(self.RHipYawPitch, 0.7, 1, 0, 1.2, use_sin=True) # joint, amplitude, frequency, phase, duration, use_sin=True
-            self.pause(0.2)
+            self.move_joints_smooth(
+            joints=[self.RAnkleRoll, self.LAnkleRoll, self.LKneePitch, self.RKneePitch, self.LHipPitch, self.RHipPitch, self.LAnklePitch, self.RAnklePitch],
+            target_positions=[0.1, 0.1, 0.6, 0.6, -0.6, -0.6, -0.3, -0.3 ],
+            durations=0.2
+            )
+            #first step
+            self.move_joints_smooth(
+                joints=[self.RAnklePitch, self.RKneePitch, self.RHipPitch, self.LAnklePitch],
+                target_positions=[0.1, 0.4, -0.9, -0.4],
+                durations=0.2
+            )
+            self.move_joints_smooth(
+                joints=[self.RAnkleRoll, self.LAnkleRoll],
+                target_positions=[-0.13, -0.13],
+                durations=0.2
+            )
+            #second step
+            self.move_joints_smooth(
+                joints=[self.RAnklePitch, self.RKneePitch, self.RHipPitch, self.LAnklePitch, self.LKneePitch, self.LHipPitch, self.RAnkleRoll, self.LAnkleRoll],
+                target_positions=[-0.2, 0.4, -0.6, -0.31, 0.6, -0.7 , 0.05, 0.05],
+                durations=[0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.4, 0.4]
+            )
+            self.stabilize()
+            self.pause(0.06)
 
             if self.step(self.timeStep) == -1:
                 break
